@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, session, redirect, url_for, request
-from app.firebase import firebase_auth, firebase_db
+from app.firebase import firebase_auth, db  # Removed firebase_db
+from firebase_admin import firestore  
 
 inbox_bp = Blueprint('inbox', __name__)
 
@@ -10,21 +11,31 @@ def inbox():
         return redirect(url_for('auth.login'))
 
     try:
+        # 🔐 Verify user
         decoded_token = firebase_auth.verify_id_token(id_token)
         user_email = decoded_token.get('email', 'Anonymous')
 
-        ref = firebase_db.reference('messages')
-
+        # 📝 Handle new message
         if request.method == 'POST':
             message = request.form.get('message')
             if message:
-                ref.push({
+                db.collection('messages').add({
                     "sender": user_email,
-                    "text": message
+                    "text": message,
+                    "timestamp": firestore.SERVER_TIMESTAMP
                 })
 
-        messages_snapshot = ref.get()
-        messages = list(messages_snapshot.values()) if messages_snapshot else []
+        # 📥 Fetch messages
+        messages_ref = db.collection('messages').order_by('timestamp')
+        messages_docs = messages_ref.stream()
+        messages = [
+            {
+                "sender": doc.to_dict().get("sender", "Unknown"),
+                "text": doc.to_dict().get("text", ""),
+                "timestamp": doc.to_dict().get("timestamp")
+            }
+            for doc in messages_docs
+        ]
 
         return render_template('inbox.html', messages=messages, user_email=user_email)
 

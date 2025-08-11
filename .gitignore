@@ -47,4 +47,4 @@ publicKey.pem
 *.pem
 
 # Python virtual environment
-venv/
+.venv/
