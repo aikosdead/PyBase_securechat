@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <h2>{{ 'Sign Up' if 'signup' in request.path else 'Welcome Back' }}</h2>
+    <form method="POST">
+      <div class="input-group">
+        <label>Email</label>
+        <input type="email" name="email" placeholder="Email" required/>
+      </div>      
+      <div class="input-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Password" required/>
+      </div>
+      <button class="btn">{{ 'Create Account' if 'signup' in request.path else 'Log In' }}</button>
+    </form>
+
+    <p class="switch">
+      {% if 'signup' in request.path %}
+        Already have an account? <a href="{{ url_for('auth.login') }}">Log in</a>
+      {% else %}
+        Don’t have an account? <a href="{{ url_for('auth.signup') }}">Sign up</a>
+      {% endif %}
+    </p>
+
+    {% if error %}
+      <p class="error">{{ error }}</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

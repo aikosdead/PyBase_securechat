@@ -1,0 +1,50 @@
+# Node modules
+node_modules/
+
+# Build output
+.next/
+out/
+dist/
+
+# Vercel
+.vercel/
+
+# Firebase
+firebase-debug.log
+firebase.json
+firestore.indexes.json
+firestore.rules
+storage.rules
+serviceAccountKey.json
+
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+
+# Encryption keys (if generated locally)
+privateKey.pem
+publicKey.pem
+*.key
+*.crt
+*.p12
+*.pem
+
+# Python virtual environment
+venv/

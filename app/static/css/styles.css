@@ -1,0 +1,163 @@
+/* 1. Global Reset & Font */
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(-45deg, #1e1f27, #38395a, #1e1f27, #2d3244);
+  background-size: 600% 600%;
+  animation: gradientBG 15s ease infinite;
+  display: flex; align-items: center; justify-content: center;
+}
+/* Headings */
+h1, h2, h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+}
+
+/* Buttons */
+.btn, .btn.alt {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Labels */
+.input-group label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+/* Switch & Error */
+.switch, .error {
+  font-family: 'Inter', sans-serif;
+}
+/* 2. Animated Gradient */
+@keyframes gradientBG {
+  0% {background-position: 0% 50%;}
+  50% {background-position: 100% 50%;}
+  100% {background-position: 0% 50%;}
+}
+
+/* 3. Auth Container */
+.auth-wrapper {
+  width: 100%; max-width: 400px;
+  padding: 2rem;
+}
+
+.auth-card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 2rem;
+  color: #fff;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.37);
+}
+
+.auth-card h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+  letter-spacing: 0.5px;
+}
+
+/* 4. Inputs */
+.input-group {
+  margin-bottom: 1rem;
+}
+.input-group label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.3rem;
+}
+.input-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 1rem;
+}
+.input-group input::placeholder {
+  color: #e0e0e0;
+}
+
+/* 5. Button */
+.btn {
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: 1rem;
+}
+.btn:hover {
+  background: linear-gradient(135deg, #2575fc, #6a11cb);
+}
+
+/* 6. Switch Link */
+.switch {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+.switch a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* 7. Error Message */
+.error {
+  color: #ff6b6b;
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Landing Page */
+.landing-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  animation: gradientBG 15s ease infinite;
+}
+
+.landing-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 3rem;
+  border-radius: 12px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  max-width: 400px;
+}
+
+.landing-card h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.landing-card p {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.btn.alt {
+  background: linear-gradient(135deg, #ff6a00, #ee0979);
+}
+.btn.alt:hover {
+  background: linear-gradient(135deg, #ee0979, #ff6a00);
+}

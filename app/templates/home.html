@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="landing-wrapper">
+  <div class="landing-card">
+    <h1>Welcome to SecureChat</h1>
+    <p>Connect securely. Chat freely.</p>
+    <div class="button-group">
+      <a href="{{ url_for('auth.login') }}" class="btn">Login</a>
+      <a href="{{ url_for('auth.signup') }}" class="btn alt">Sign Up</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

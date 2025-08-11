@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Inbox Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #1c1c1c, #2c2c2c);
+            color: #fff;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 300px;
+            background-color: #2f3136;
+            padding: 20px;
+            box-sizing: border-box;
+            border-right: 1px solid #444;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            font-size: 20px;
+            color: #00bfa5;
+        }
+
+        .chat-list {
+            margin-top: 20px;
+        }
+
+        .chat-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #3a3b3c;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .chat-item:hover {
+            background-color: #4e5052;
+        }
+
+        .chat-item .name {
+            font-weight: bold;
+        }
+
+        .chat-item .preview {
+            font-size: 14px;
+            color: #ccc;
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .top-bar h1 {
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .logout-btn {
+            background-color: #00bfa5;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .messages {
+            flex: 1;
+            background-color: #1e1f21;
+            border-radius: 10px;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+        }
+
+        .message .sender {
+            font-weight: bold;
+            color: #00bfa5;
+        }
+
+        .message .text {
+            margin-top: 5px;
+        }
+
+        .input-area {
+            display: flex;
+            margin-top: 20px;
+        }
+
+        .input-area input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            margin-right: 10px;
+            background-color: #2f3136;
+            color: #fff;
+        }
+
+        .input-area button {
+            background-color: #00bfa5;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h2>Chats</h2>
+            <div class="chat-list">
+                <div class="chat-item">
+                    <div class="name">Global Chat</div>
+                    <div class="preview">Chat with your friends here</div>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="top-bar">
+                <h1>Inbox</h1>
+                <form action="/auth/logout" method="post">
+                    <button class="logout-btn">Logout</button>
+                </form>
+            </div>
+            <div class="messages">
+                {% for msg in messages %}
+                <div class="message">
+                    <div class="sender">{{ msg.sender }}</div>
+                    <div class="text">{{ msg.text }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            <form method="POST" action="{{ url_for('inbox.inbox') }}" class="input-area">
+                <input type="text" name="message" placeholder="Type your message..." required>
+                <button type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
