@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()  # ← reads .env into os.environ
+import os
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session 
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,6 +9,10 @@ from app import firebase  # Firebase setup (db, auth)
 from firebase_admin import auth as firebase_auth
 from google.cloud import firestore  # For SERVER_TIMESTAMP
 from app.firebase import db, auth
+
+API_KEY = os.getenv("FIREBASE_WEB_API_KEY")
+if not API_KEY:
+    raise RuntimeError("Missing FIREBASE_WEB_API_KEY environment variable")
 
 firebase_auth = firebase.auth
 
@@ -39,7 +46,7 @@ def login():
             "password": password,
             "returnSecureToken": True
         }
-        api_key = "AIzaSyD55Lc5HbG-aTY1cV-uRn5su6ih6z20fgU"
+        api_key = API_KEY
         url = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={api_key}"
         response = requests.post(url, json=payload)
         data = response.json()
