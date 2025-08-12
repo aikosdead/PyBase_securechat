@@ -23,12 +23,46 @@
             padding: 20px;
             box-sizing: border-box;
             border-right: 1px solid #444;
+            overflow-y: auto;
         }
 
         .sidebar h2 {
             margin-top: 0;
             font-size: 20px;
             color: #00bfa5;
+        }
+
+        .search-form {
+            margin-bottom: 20px;
+        }
+
+        .search-form input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            background-color: #3a3b3c;
+            color: #fff;
+        }
+
+        .search-result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #3a3b3c;
+            border-radius: 8px;
+        }
+
+        .search-result .name {
+            font-weight: bold;
+            color: #00bfa5;
+        }
+
+        .search-result a {
+            display: inline-block;
+            margin-top: 6px;
+            color: #00bfa5;
+            text-decoration: none;
+            font-weight: bold;
         }
 
         .chat-list {
@@ -50,11 +84,14 @@
 
         .chat-item .name {
             font-weight: bold;
+            font-size: 16px;
+            color: #00bfa5;
         }
 
         .chat-item .preview {
             font-size: 14px;
             color: #ccc;
+            margin-top: 4px;
         }
 
         .main {
@@ -93,44 +130,11 @@
             border-radius: 10px;
             padding: 20px;
             overflow-y: auto;
-        }
-
-        .message {
-            margin-bottom: 15px;
-        }
-
-        .message .sender {
-            font-weight: bold;
-            color: #00bfa5;
-        }
-
-        .message .text {
-            margin-top: 5px;
-        }
-
-        .input-area {
             display: flex;
-            margin-top: 20px;
-        }
-
-        .input-area input {
-            flex: 1;
-            padding: 10px;
-            border-radius: 6px;
-            border: none;
-            margin-right: 10px;
-            background-color: #2f3136;
-            color: #fff;
-        }
-
-        .input-area button {
-            background-color: #00bfa5;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            color: #fff;
-            cursor: pointer;
-            font-weight: bold;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #aaa;
         }
     </style>
 </head>
@@ -138,32 +142,59 @@
     <div class="container">
         <div class="sidebar">
             <h2>Chats</h2>
-            <div class="chat-list">
-                <div class="chat-item">
-                    <div class="name">Global Chat</div>
-                    <div class="preview">Chat with your friends here</div>
-                </div>
-            </div>
+
+            <!-- 🔍 Search Form -->
+            <form method="POST" class="search-form">
+                <input type="text" name="username" placeholder="Search username..." required>
+            </form>
+
+            <!-- 🔍 Search Result -->
+{% if result %}
+<div class="search-result">
+    <a href="{{ url_for('auth.chat', other_id=result.uid) }}" style="text-decoration: none; color: inherit;">
+        <div class="name">{{ result.username }}</div>
+        {% if result.photo_url %}
+        <img src="{{ result.photo_url }}" alt="Profile photo" width="50" style="margin-top: 8px; border-radius: 50%;">
+        {% endif %}
+        <div style="margin-top: 3px; color: #022c26; font-weight: bold;">Start Chat</div>
+    </a>
+</div>
+{% elif query %}
+<div class="search-result">
+    <div class="name">No user found for "{{ query }}"</div>
+</div>
+{% endif %}
+
+<!-- 💬 Conversation List -->
+<div class="chat-list">
+    {% for convo in conversations %}
+    <a href="{{ url_for('auth.chat', other_id=convo.other_id) }}" style="text-decoration: none; color: inherit;">
+        <div class="chat-item">
+            <div class="name">{{ convo.other_username }}</div>
+            <div class="preview">{{ convo.preview or 'No messages yet' }}</div>
         </div>
+    </a>
+    {% endfor %}
+    {% if conversations|length == 0 %}
+    <div class="chat-item">
+        <div class="name">No conversations yet</div>
+        <div class="preview">Start chatting with someone!</div>
+    </div>
+    {% endif %}
+</div>
+
+        </div>
+
         <div class="main">
             <div class="top-bar">
                 <h1>Inbox</h1>
-                <form action="/auth/logout" method="post">
+                <form action="{{ url_for('auth.logout') }}" method="get">
                     <button class="logout-btn">Logout</button>
                 </form>
             </div>
             <div class="messages">
-                {% for msg in messages %}
-                <div class="message">
-                    <div class="sender">{{ msg.sender }}</div>
-                    <div class="text">{{ msg.text }}</div>
-                </div>
-                {% endfor %}
+                Select a conversation from the left to start chatting.
             </div>
-            <form method="POST" action="{{ url_for('inbox.inbox') }}" class="input-area">
-                <input type="text" name="message" placeholder="Type your message..." required>
-                <button type="submit">Send</button>
-            </form>
         </div>
     </div>
 </body>

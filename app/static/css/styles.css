@@ -161,3 +161,35 @@ h1, h2, h3 {
 .btn.alt:hover {
   background: linear-gradient(135deg, #ee0979, #ff6a00);
 }
+
+/* 8. Inbox Search Result Hover */
+.search-result:hover {
+  background-color: #4e5052;
+  cursor: pointer;
+}
+
+.message-meta {
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.sender-name {
+  font-weight: bold;
+  color: #ffffff; /* or #333 for light theme */
+}
+
+.timestamp {
+  color: #aaaaaa;
+  margin-left: 6px;
+}
+
+.message-text {
+  font-size: 14px;
+  color: #e0e0e0;
+}
+.message:hover .message-text {
+  background-color: #2a2a2a;
+  border-radius: 4px;
+  padding: 4px;
+}
+
