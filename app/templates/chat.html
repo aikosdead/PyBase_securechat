@@ -108,29 +108,28 @@
     }
 
     .message-meta {
-  font-size: 12px;
-  margin-bottom: 4px;
-  color: #bbbbbb; /* Light gray for readability */
-}
+      font-size: 12px;
+      margin-bottom: 4px;
+      color: #bbbbbb;
+    }
 
-.sender-name {
-  font-weight: bold;
-  color: #ffffff; /* Bright white for sender name */
-}
+    .sender-name {
+      font-weight: bold;
+      color: #ffffff;
+    }
 
-.timestamp {
-  color: #999999; /* Softer gray for timestamp */
-  margin-left: 6px;
-}
+    .timestamp {
+      color: #999999;
+      margin-left: 6px;
+    }
 
-.message-sent .message-meta {
-  color: #e0e0e0;
-}
+    .message-sent .message-meta {
+      color: #e0e0e0;
+    }
 
-.message-received .message-meta {
-  color: #bbbbbb;
-}
-
+    .message-received .message-meta {
+      color: #bbbbbb;
+    }
   </style>
 </head>
 <body>
@@ -158,32 +157,32 @@
       <!-- Header -->
       <header class="d-flex align-items-center">
         <img
-          src="{{ other_user.photo_url or url_for('static', filename='img/default-avatar.png') }}"
-          alt="Avatar"
-          class="rounded-circle me-2"
-          width="40" height="40"
-        >
+  src="{{ other_user.photo_url | default(url_for('static', filename='img/default-avatar.png'), true) }}"
+  alt="{{ other_user.display_name }}'s avatar"
+  title="{{ other_user.display_name }}"
+  class="rounded-circle me-2"
+  width="40" height="40"
+/>
         <h5 class="mb-0">{{ other_user.display_name }}</h5>
       </header>
 
       <!-- Messages -->
-<div class="messages">
-    {% for msg in messages %}
-      {% set sent = (msg.sender_id == session['user_id']) %}
-      <div class="message {% if sent %}message-sent{% else %}message-received{% endif %}">
-        <div class="message-meta">
-          <span class="sender-name">
-            {{ sent and 'You' or other_user.display_name }}
-          </span>
-          <span class="timestamp">
-            · {{ msg.timestamp.strftime('%H:%M') if msg.timestamp }}
-          </span>
-        </div>
-        <div class="message-text">{{ msg.text }}</div>
+      <div class="messages">
+        {% for msg in messages %}
+          {% set sent = (msg.sender == session['user_id']) %}
+          <div class="message {% if sent %}message-sent{% else %}message-received{% endif %}">
+            <div class="message-meta">
+              <span class="sender-name">
+                {{ 'You' if sent else other_user.display_name }}
+              </span>
+              <span class="timestamp">
+                · {{ msg.timestamp.strftime('%H:%M') if msg.timestamp }}
+              </span>
+            </div>
+            <div class="message-text">{{ msg.text }}</div>
+          </div>
+        {% endfor %}
       </div>
-    {% endfor %}
-  </div>
-  
 
       <!-- Compose Box -->
       <footer class="compose">

@@ -6,6 +6,7 @@ import os
 
 def create_app():
     app = Flask(__name__)
+    os.makedirs('static/avatars', exist_ok=True)
     
     # 🔐 Secret key for sessions
     app.secret_key = os.getenv("SECRET_KEY", "fallback_key")

@@ -3,7 +3,7 @@
 <div class="auth-wrapper">
   <div class="auth-card">
     <h2>Create Your Account</h2>
-    <form method="POST" action="{{ url_for('auth.signup') }}">
+    <form method="POST" action="{{ url_for('auth.signup') }}" enctype="multipart/form-data">
       <div class="input-group">
         <label for="email">Email</label>
         <input type="text" name="email" id="email" placeholder="Enter Email" required />
@@ -19,6 +19,12 @@
         <input type="password" name="password" id="password" placeholder="Enter password" required />
       </div>
 
+      <div class="input-group">
+        <label for="avatar">Profile Picture</label>
+        <input type="file" name="avatar" id="avatar" accept="image/*" onchange="previewAvatar(event)" />
+        <img id="avatar-preview" src="{{ url_for('static', filename='img/default-avatar.png') }}" alt="Avatar preview" class="avatar-preview" />
+      </div>
+
       <button class="btn" type="submit">Sign Up</button>
     </form>
 
@@ -32,4 +38,28 @@
     {% endif %}
   </div>
 </div>
+
+<style>
+  .avatar-preview {
+    display: block;
+    margin-top: 10px;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+  }
+</style>
+
+<script>
+  function previewAvatar(event) {
+    const reader = new FileReader();
+    reader.onload = function () {
+      document.getElementById('avatar-preview').src = reader.result;
+    };
+    if (event.target.files[0]) {
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  }
+</script>
 {% endblock %}
