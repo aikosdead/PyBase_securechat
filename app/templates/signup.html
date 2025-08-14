@@ -3,7 +3,8 @@
 <div class="auth-wrapper">
   <div class="auth-card">
     <h2>Create Your Account</h2>
-    <form method="POST" action="{{ url_for('auth.signup') }}" enctype="multipart/form-data">
+
+    <form id="signup-form" method="POST" action="{{ url_for('auth.signup') }}" enctype="multipart/form-data">
       <div class="input-group">
         <label for="email">Email</label>
         <input type="text" name="email" id="email" placeholder="Enter Email" required />
@@ -25,6 +26,8 @@
         <img id="avatar-preview" src="{{ url_for('static', filename='img/default-avatar.png') }}" alt="Avatar preview" class="avatar-preview" />
       </div>
 
+      <input type="hidden" name="public_key" id="public_key" />
+
       <button class="btn" type="submit">Sign Up</button>
     </form>
 
@@ -39,18 +42,6 @@
   </div>
 </div>
 
-<style>
-  .avatar-preview {
-    display: block;
-    margin-top: 10px;
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 50%;
-    border: 1px solid #ccc;
-  }
-</style>
-
 <script>
   function previewAvatar(event) {
     const reader = new FileReader();
@@ -62,4 +53,18 @@
     }
   }
 </script>
+
+<script type="module" src="{{ url_for('static', filename='js/signup-init.js') }}"></script>
+
+<style>
+  .avatar-preview {
+    display: block;
+    margin-top: 10px;
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid #ccc;
+  }
+</style>
 {% endblock %}

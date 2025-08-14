@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ user.display_name or user.username }}'s Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .profile-card {
+            background: #1e1e1e;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            max-width: 400px;
+        }
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 1rem;
+            border: 2px solid #444;
+        }
+        .username {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .bio {
+            margin-top: 1rem;
+            font-style: italic;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-card">
+        <img src="{{ user.avatar_url or url_for('static', filename='default-avatar.png') }}" alt="Avatar" class="avatar">
+        
+        <div class="username">
+            <a href="{{ url_for('profiles.profile', username=user.username) }}" class="chat-username text-decoration-none text-light">
+                {{ user.display_name or user.username }}
+            </a>
+        </div>
+        
+        {% if user.bio %}
+            <div class="bio">{{ user.bio }}</div>
+        {% else %}
+            <div class="bio">This user hasn’t added a bio yet.</div>
+        {% endif %}
+    </div>
+    
+</body>
+</html>

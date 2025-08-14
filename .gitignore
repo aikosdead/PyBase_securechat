@@ -16,6 +16,7 @@ firestore.indexes.json
 firestore.rules
 storage.rules
 serviceAccountKey.json
+firebase-creds.json
 
 # Environment variables
 .env

@@ -223,3 +223,13 @@ input[type="file"]::file-selector-button {
   border-radius: 50%;
   object-fit: cover;
 }
+
+.chat-username {
+  font-weight: bold;
+  color: #e0e0e0;
+}
+
+.chat-username:hover {
+  color: #0d6efd;
+  text-decoration: underline;
+}

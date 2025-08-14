@@ -136,6 +136,19 @@
             font-size: 18px;
             color: #aaa;
         }
+
+        .conversation-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .conversation-link:hover {
+            background-color: #f9f9f9;
+        }
+
     </style>
 </head>
 <body>
@@ -156,7 +169,7 @@
         {% if result.photo_url %}
         <img src="{{ result.photo_url }}" alt="Profile photo" width="50" style="margin-top: 8px; border-radius: 50%;">
         {% endif %}
-        <div style="margin-top: 3px; color: #022c26; font-weight: bold;">Start Chat</div>
+        <div style="margin-top: 4px; color: #b8e2db; font-weight: bold; font-size: 13px;">Start Chat</div>
     </a>
 </div>
 {% elif query %}
@@ -172,6 +185,7 @@
         <div class="chat-item">
             <div class="name">{{ convo.other_username }}</div>
             <div class="preview">{{ convo.preview or 'No messages yet' }}</div>
+            <div class="timestamp">{{ convo.timestamp_str }}</div>
         </div>
     </a>
     {% endfor %}

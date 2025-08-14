@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, session, redirect, url_for, flash, request
-from app.firebase import firebase_auth, db
+from app.firebase import auth, db
 from firebase_admin import firestore
 from datetime import datetime
 
@@ -15,6 +15,7 @@ def inbox_view():
         result = None
         query = None
 
+        # 🔍 Handle search
         if request.method == 'POST':
             query = request.form.get('username', '').strip().lower()
             profiles_ref = db.collection('profiles')
@@ -30,6 +31,7 @@ def inbox_view():
                     }
                     break
 
+        # 📥 Build inbox previews
         conversations = []
         convos_ref = db.collection('conversations').where('participants', 'array_contains', me_id)
         convo_docs = convos_ref.stream()
@@ -37,33 +39,40 @@ def inbox_view():
         for convo in convo_docs:
             data = convo.to_dict()
             participants = data.get('participants', [])
-            other_id = [uid for uid in participants if uid != me_id][0]
+            other_id = next((uid for uid in participants if uid != me_id), None)
+            if not other_id:
+                continue
 
+            # 🔍 Get other user's profile
             profile_doc = db.collection('profiles').document(other_id).get()
-            profile = profile_doc.to_dict() if profile_doc.exists else {'username': 'Unknown'}
+            profile = profile_doc.to_dict() if profile_doc.exists else {}
+            other_username = profile.get('display_name') or profile.get('username') or 'Unknown'
 
+            # 🔐 Get last message
             convo_id = '_'.join(sorted([me_id, other_id]))
-            messages_ref = db.collection('conversations').document(convo_id).collection('messages').order_by('timestamp', direction=firestore.Query.DESCENDING).limit(1)
+            messages_ref = db.collection('conversations').document(convo_id).collection('messages') \
+                             .order_by('created_at', direction=firestore.Query.DESCENDING).limit(1)
             last_msg_docs = messages_ref.stream()
             last_msg = next(last_msg_docs, None)
 
-            preview = ''
+            preview = '[Encrypted]'
             timestamp_str = ''
             if last_msg:
                 msg_data = last_msg.to_dict()
-                preview = msg_data.get('text', '')
-                timestamp = msg_data.get('timestamp')
+                timestamp = msg_data.get('created_at')
                 if timestamp:
-                    # Convert Firestore timestamp to readable format
-                    timestamp_str = timestamp.strftime('%I:%M %p')  # e.g., 11:42 PM
-
+                    timestamp_str = timestamp.strftime('%b %d, %I:%M %p')  # e.g., Aug 14, 11:42 PM
 
             conversations.append({
                 'other_id': other_id,
-                'other_username': profile.get('username', 'Unknown'),
+                'other_username': other_username,
                 'preview': preview,
-                'timestamp': timestamp_str
+                'timestamp': timestamp,  # raw datetime object
+                'timestamp_str': timestamp.strftime('%b %d, %I:%M %p') if timestamp else '',
+                'photo_url': profile.get('photo_url', '')
             })
+            # 🗂️ Sort conversations by timestamp (most recent first)
+            conversations.sort(key=lambda x: x['timestamp'], reverse=True)
 
         return render_template('inbox.html',
                                result=result,
@@ -74,5 +83,4 @@ def inbox_view():
         flash("Session expired or invalid. Please log in again.")
         print(f"Inbox route error: {e}")
         return redirect(url_for('auth.login'))
-
 

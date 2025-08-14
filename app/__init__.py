@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from app.routes.auth import auth_bp
 from app.routes.inbox import inbox_bp
+from app.routes.profiles import profiles_bp
 from app import firebase  # Firebase setup (db, auth)
 import os
 
@@ -22,6 +23,7 @@ def create_app():
     # 📦 Register Blueprints
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(inbox_bp)
+    app.register_blueprint(profiles_bp, url_prefix='/profile')
 
     # 🏠 Optional: Home route
     @app.route("/")
