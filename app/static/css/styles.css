@@ -233,3 +233,8 @@ input[type="file"]::file-selector-button {
   color: #0d6efd;
   text-decoration: underline;
 }
+
+.message-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+}

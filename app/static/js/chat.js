@@ -23,6 +23,33 @@ import * as E2EE from './e2ee.js';
     console.warn('Unexpected recipient key format:', recipientFmt);
   }
 
+  // 🧱 Reusable Message Renderer
+  function renderMessage({ text, sender, timestamp, isSent }) {
+    const bubble = document.createElement('div');
+    bubble.classList.add('message', isSent ? 'message-sent' : 'message-received');
+
+    const meta = document.createElement('div');
+    meta.classList.add('message-meta');
+
+    const nameSpan = document.createElement('span');
+    nameSpan.classList.add('sender-name');
+    nameSpan.textContent = sender;
+
+    const timeSpan = document.createElement('span');
+    timeSpan.classList.add('timestamp');
+    timeSpan.textContent = timestamp;
+
+    const body = document.createElement('div');
+    body.classList.add('message-body');
+    body.textContent = text;
+
+    meta.appendChild(nameSpan);
+    meta.appendChild(timeSpan);
+    bubble.appendChild(meta);
+    bubble.appendChild(body);
+    container.appendChild(bubble);
+  }
+
   // 🔄 Message Sending
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -54,20 +81,16 @@ import * as E2EE from './e2ee.js';
         month: 'short', day: 'numeric',
         hour: 'numeric', minute: '2-digit',
         hour12: true
-      });      
+      });
 
-      const bubble = document.createElement('div');
-      bubble.classList.add('message', 'message-sent');
-      bubble.innerHTML = `
-        <div class="message-meta">
-          <span class="sender-name">You</span>
-          <span class="timestamp">${formatted}</span>
-        </div>
-        ${msg}
-      `;
-      container.appendChild(bubble);
+      renderMessage({
+        text: msg,
+        sender: 'You',
+        timestamp: formatted,
+        isSent: true
+      });
+
       container.scrollTop = container.scrollHeight;
-
       input.value = '';
     } catch (err) {
       console.error('Encryption or sending failed:', err);
@@ -100,24 +123,20 @@ import * as E2EE from './e2ee.js';
 
       const ts = msg.timestamp ? new Date(msg.timestamp) : null;
       const formatted = ts
-  ? ts.toLocaleString('en-US', {
-      timeZone: 'Asia/Manila',
-      month: 'short', day: 'numeric',
-      hour: 'numeric', minute: '2-digit',
-      hour12: true
-    })
-  : 'Unknown time';
+        ? ts.toLocaleString('en-US', {
+            timeZone: 'Asia/Manila',
+            month: 'short', day: 'numeric',
+            hour: 'numeric', minute: '2-digit',
+            hour12: true
+          })
+        : 'Unknown time';
 
-      const bubble = document.createElement('div');
-      bubble.classList.add('message', isSent ? 'message-sent' : 'message-received');
-      bubble.innerHTML = `
-        <div class="message-meta">
-          <span class="sender-name">${senderName}</span>
-          <span class="timestamp">${formatted}</span>
-        </div>
-        ${decrypted}
-      `;
-      container.appendChild(bubble);
+      renderMessage({
+        text: decrypted,
+        sender: senderName,
+        timestamp: formatted,
+        isSent
+      });
     } catch (err) {
       console.warn('Failed to decrypt message:', msg, err);
     }
