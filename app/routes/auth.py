@@ -127,7 +127,7 @@ def login():
 
     if "idToken" in data:
         id_token = data["idToken"]
-        decoded = firebase.auth.verify_id_token(id_token)
+        decoded = firebase.auth.verify_id_token(id_token, clock_skew_seconds=5)
         session['id_token'] = id_token
         session['user_id'] = decoded['uid']
         get_or_create_csrf()
@@ -211,7 +211,7 @@ def chat(other_id):
         msg = doc.to_dict()
         msg['id'] = doc.id
         ts = msg.get('created_at')
-        msg['timestamp'] = ts.strftime('%b %d, %I:%M %p') if ts else ''
+        msg['timestamp'] = ts.strftime('%Y-%m-%dT%H:%M:%SZ') if ts else ''
         messages.append(msg)
 
     firebase_config = {

@@ -11,6 +11,7 @@ import * as E2EE from './e2ee.js';
   const otherId = document.getElementById('recipient-public-key')?.dataset?.uid;
   const currentUserId = document.getElementById('current-user-id')?.value;
   const container = document.getElementById('chat-messages');
+  const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   if (!metaRecKey || !metaCsrf || !otherId || !currentUserId || !container) {
     console.error('Missing required metadata or DOM elements');
@@ -22,6 +23,44 @@ import * as E2EE from './e2ee.js';
   if (recipientFmt !== 'curve25519_base64') {
     console.warn('Unexpected recipient key format:', recipientFmt);
   }
+
+  function formatTimestamp(ts) {
+    if (!ts) return 'Unknown time';
+  
+    const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  
+    let date;
+    try {
+      if (ts.toDate) {
+        date = ts.toDate(); // Firestore Timestamp
+      } else if (ts instanceof Date) {
+        date = ts;
+      } else if (typeof ts === 'string') {
+        const safeTs = ts.endsWith('Z') ? ts : ts + 'Z';
+        date = new Date(safeTs);
+      } else if (typeof ts === 'number') {
+        date = new Date(ts); // Unix timestamp
+      } else {
+        throw new RangeError('Unrecognized timestamp format');
+      }
+  
+      if (isNaN(date.getTime())) throw new RangeError('Invalid time value');
+    } catch (err) {
+      console.warn('formatTimestamp failed:', ts, err);
+      return 'Invalid time';
+    }
+  
+    return new Intl.DateTimeFormat('en-US', {
+      timeZone: userTimeZone,
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    }).format(date);
+  }
+  
+  
 
   // 🧱 Reusable Message Renderer
   function renderMessage({ text, sender, timestamp, isSent }) {
@@ -76,12 +115,7 @@ import * as E2EE from './e2ee.js';
 
       // ✅ Append sent message immediately
       const now = new Date();
-      const formatted = now.toLocaleString('en-US', {
-        timeZone: 'Asia/Manila',
-        month: 'short', day: 'numeric',
-        hour: 'numeric', minute: '2-digit',
-        hour12: true
-      });
+      const formatted = formatTimestamp(now);
 
       renderMessage({
         text: msg,
@@ -117,20 +151,14 @@ import * as E2EE from './e2ee.js';
     try {
       const decrypted = await E2EE.decryptMessage(msg);
       if (!decrypted) continue;
-
+  
       const isSent = msg.from === currentUserId;
       const senderName = isSent ? 'You' : document.querySelector('.chat-header strong')?.textContent || 'Unknown';
-
-      const ts = msg.timestamp ? new Date(msg.timestamp) : null;
-      const formatted = ts
-        ? ts.toLocaleString('en-US', {
-            timeZone: 'Asia/Manila',
-            month: 'short', day: 'numeric',
-            hour: 'numeric', minute: '2-digit',
-            hour12: true
-          })
-        : 'Unknown time';
-
+  
+      console.log('Raw timestamp:', msg.timestamp);  // ✅ Step 1: log raw value
+  
+      const formatted = formatTimestamp(msg.timestamp);  // ✅ Step 2: format it
+  
       renderMessage({
         text: decrypted,
         sender: senderName,
@@ -140,7 +168,7 @@ import * as E2EE from './e2ee.js';
     } catch (err) {
       console.warn('Failed to decrypt message:', msg, err);
     }
-  }
+  }  
 
   // ✅ Auto-scroll to bottom
   container.scrollTop = container.scrollHeight;
