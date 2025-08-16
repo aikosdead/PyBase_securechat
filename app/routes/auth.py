@@ -215,7 +215,7 @@ def chat(other_id):
         messages.append(msg)
 
     firebase_config = {
-        "apiKey": os.getenv("FIREBASE_API_KEY"),
+        "apiKey": os.getenv("FIREBASE_WEB_API_KEY"),
         "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN"),
         "projectId": os.getenv("FIREBASE_PROJECT_ID"),
         "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET"),
@@ -235,8 +235,3 @@ def chat(other_id):
         messages=messages,
         firebase_config=firebase_config
     )
-
-
-@auth_bp.route('/test-session')
-def test_session():
-    return jsonify(dict(session))
