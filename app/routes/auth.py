@@ -248,12 +248,13 @@ def chat(other_id):
     messages = []
     for doc in raw_messages:
         msg = doc.to_dict()
+        expires = msg.get('expiresAt')
+        if msg.get("ephemeral") and expires and expires < now:
+            continue  # Skip expired ephemeral messages
+
         msg['id'] = doc.id
-        
         ts = msg.get('created_at')
         msg['timestamp'] = ts.strftime('%Y-%m-%dT%H:%M:%SZ') if ts else ''
-
-        expires = msg.get('expiresAt')
         msg['expiresAt'] = expires.isoformat() if expires else None
 
         messages.append(msg)
@@ -266,6 +267,7 @@ def chat(other_id):
         "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID"),
         "appId": os.getenv("FIREBASE_APP_ID")
     }
+    print(f"Returning {len(messages)} messages")
 
     return render_template(
         'chat.html',
