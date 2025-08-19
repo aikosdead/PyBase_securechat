@@ -257,6 +257,8 @@ def chat(other_id):
         msg['timestamp'] = ts.strftime('%Y-%m-%dT%H:%M:%SZ') if ts else ''
         msg['expiresAt'] = expires.isoformat() if expires else None
 
+        # 🚫 Remove raw datetime before passing to Jinja
+        msg.pop('created_at', None)
         messages.append(msg)
 
     firebase_config = {
