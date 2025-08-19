@@ -245,21 +245,28 @@ def chat(other_id):
     # Optional: sort combined messages by created_at
     raw_messages.sort(key=lambda doc: doc.to_dict().get("created_at") or datetime.min)
 
+    def clean_message(msg, doc_id):
+        return {
+            "id": doc_id,
+            "ciphertext": msg.get("ciphertext"),
+            "nonce": msg.get("nonce"),
+            "from": msg.get("from"),
+            "sender_pub": msg.get("sender_pub"),
+            "scheme": msg.get("scheme"),
+            "ephemeral": msg.get("ephemeral", False),
+            "timestamp": msg.get("created_at").strftime('%Y-%m-%dT%H:%M:%SZ') if msg.get("created_at") else '',
+            "expiresAt": msg.get("expiresAt").isoformat() if isinstance(msg.get("expiresAt"), datetime) else None
+        }
+
+
     messages = []
     for doc in raw_messages:
         msg = doc.to_dict()
         expires = msg.get('expiresAt')
-        if msg.get("ephemeral") and expires and expires < now:
-            continue  # Skip expired ephemeral messages
+        if msg.get("ephemeral") and isinstance(expires, datetime) and expires < now:
+            continue
+        messages.append(clean_message(msg, doc.id))
 
-        msg['id'] = doc.id
-        ts = msg.get('created_at')
-        msg['timestamp'] = ts.strftime('%Y-%m-%dT%H:%M:%SZ') if ts else ''
-        msg['expiresAt'] = expires.isoformat() if expires else None
-
-        # 🚫 Remove raw datetime before passing to Jinja
-        msg.pop('created_at', None)
-        messages.append(msg)
 
     firebase_config = {
         "apiKey": os.getenv("FIREBASE_WEB_API_KEY"),
