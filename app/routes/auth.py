@@ -4,10 +4,12 @@ load_dotenv()
 import os, secrets, json
 from flask import Blueprint, render_template, request, redirect, url_for, flash, session, abort, jsonify
 from google.cloud import firestore
+from google.protobuf.timestamp_pb2 import Timestamp
 from werkzeug.utils import secure_filename
 import requests
 import cloudinary
 import cloudinary.uploader
+from datetime import datetime, timezone
 
 from app import firebase
 from app.firebase import db, auth
@@ -192,20 +194,51 @@ def chat(other_id):
         if not all(k in data for k in required):
             abort(400, description="Missing fields")
 
-        msg_doc = {
-            'from': me_id,
-            'to': other_id,
-            'ciphertext': data['ciphertext'],
-            'nonce': data['nonce'],
-            'sender_pub': data['sender_pub'],
-            'scheme': data.get('scheme', 'nacl-secretbox-x25519'),
-            'created_at': firestore.SERVER_TIMESTAMP
+        ephemeral = data.get("ephemeral", False)
+        expires_raw = data.get("expiresAt")
+        if ephemeral and not expires_raw:
+            abort(400, description="Missing expiresAt for ephemeral message")
+
+        expires_ts = datetime.fromtimestamp(expires_raw / 1000, tz=timezone.utc)
+
+        message = {
+        "ciphertext": data["ciphertext"],
+        "nonce": data["nonce"],
+        "from": me_id,
+        "sender_pub": data["sender_pub"],
+        "scheme": data.get("scheme", "nacl-secretbox-x25519"),
+        "created_at": firestore.SERVER_TIMESTAMP,
+        "ephemeral": data.get("ephemeral", False),
+        "expiresAt": expires_ts
         }
-        msgs_ref.add(msg_doc)
+        msgs_ref.add(message)
         return jsonify({'status': 'ok'})
 
-    # 📜 Serialize messages
-    raw_messages = msgs_ref.order_by('created_at').stream()
+# 📜 Serialize messages
+    now = datetime.now(timezone.utc)
+
+    # Non-ephemeral messages
+    non_ephemeral = msgs_ref.where("ephemeral", "==", False).order_by("created_at").stream()
+
+    # Ephemeral messages that haven't expired (explicit index match)
+    try: active_ephemeral = msgs_ref.order_by("ephemeral")\
+                           .where("ephemeral", "==", True)\
+                           .order_by("expiresAt")\
+                           .where("expiresAt", ">", now)\
+                           .order_by("created_at")\
+                           .order_by("__name__")\
+                           .stream()
+    except Exception as e:
+        print("⚠️ Firestore index error:", e)
+        active_ephemeral = []
+
+
+    # Combine both
+    raw_messages = list(non_ephemeral) + list(active_ephemeral)
+
+    # Optional: sort combined messages by created_at
+    raw_messages.sort(key=lambda doc: doc.to_dict().get("created_at"))
+
     messages = []
     for doc in raw_messages:
         msg = doc.to_dict()

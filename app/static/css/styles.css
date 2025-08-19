@@ -1,6 +1,8 @@
 /* 1. Global Reset & Font */
 * { margin:0; padding:0; box-sizing:border-box; }
 body {
+  position: relative;
+  overflow: visible;
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
   background: linear-gradient(-45deg, #1e1f27, #38395a, #1e1f27, #2d3244);
@@ -237,4 +239,15 @@ input[type="file"]::file-selector-button {
 .message-body {
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+.chat-header {
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+}
+
+.message.ephemeral {
+  opacity: 0.8;
+  border: 1px dashed #888;
 }
