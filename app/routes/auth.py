@@ -229,11 +229,11 @@ def chat(other_id):
     # Ephemeral messages that haven't expired (explicit index match)
     try: active_ephemeral = msgs_ref.order_by("ephemeral")\
                            .where("ephemeral", "==", True)\
-                           .order_by("expiresAt")\
                            .where("expiresAt", ">", now)\
+                           .order_by("expiresAt")\
                            .order_by("created_at")\
-                           .order_by("__name__")\
                            .stream()
+                                                 
     except Exception as e:
         print("⚠️ Firestore index error:", e)
         active_ephemeral = []
@@ -243,14 +243,19 @@ def chat(other_id):
     raw_messages = list(non_ephemeral) + list(active_ephemeral)
 
     # Optional: sort combined messages by created_at
-    raw_messages.sort(key=lambda doc: doc.to_dict().get("created_at"))
+    raw_messages.sort(key=lambda doc: doc.to_dict().get("created_at") or datetime.min)
 
     messages = []
     for doc in raw_messages:
         msg = doc.to_dict()
         msg['id'] = doc.id
+        
         ts = msg.get('created_at')
         msg['timestamp'] = ts.strftime('%Y-%m-%dT%H:%M:%SZ') if ts else ''
+
+        expires = msg.get('expiresAt')
+        msg['expiresAt'] = expires.isoformat() if expires else None
+
         messages.append(msg)
 
     firebase_config = {
