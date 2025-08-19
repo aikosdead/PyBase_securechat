@@ -196,10 +196,14 @@ def chat(other_id):
 
         ephemeral = data.get("ephemeral", False)
         expires_raw = data.get("expiresAt")
-        if ephemeral and not expires_raw:
-            abort(400, description="Missing expiresAt for ephemeral message")
 
-        expires_ts = datetime.fromtimestamp(expires_raw / 1000, tz=timezone.utc)
+        if ephemeral:
+            if not isinstance(expires_raw, (int, float)):
+                abort(400, description="Missing or invalid expiresAt for ephemeral message")
+            expires_ts = datetime.fromtimestamp(expires_raw / 1000, tz=timezone.utc)
+        else:
+            expires_ts = None
+
 
         message = {
         "ciphertext": data["ciphertext"],
@@ -208,9 +212,11 @@ def chat(other_id):
         "sender_pub": data["sender_pub"],
         "scheme": data.get("scheme", "nacl-secretbox-x25519"),
         "created_at": firestore.SERVER_TIMESTAMP,
-        "ephemeral": data.get("ephemeral", False),
-        "expiresAt": expires_ts
+        "ephemeral": ephemeral,
         }
+        if expires_ts:
+            message["expiresAt"] = expires_ts
+
         msgs_ref.add(message)
         return jsonify({'status': 'ok'})
 

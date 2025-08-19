@@ -49,3 +49,17 @@ publicKey.pem
 
 # Python virtual environment
 .venv/
+
+#instances
+instance/
+*.pyc
+__pycache__/
+
+#frontend clutter
+*.log
+*.tmp
+*.bak
+*.orig
+
+#scripts
+scripts/
